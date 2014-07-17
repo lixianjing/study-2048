@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
@@ -51,6 +52,11 @@ public class MainActivity extends Activity {
 
 
         animLayer = (AnimLayer) findViewById(R.id.animLayer);
+
+        if (savedInstanceState != null) {
+            gameView.loadGame(savedInstanceState);
+        }
+
     }
 
     @Override
@@ -79,6 +85,10 @@ public class MainActivity extends Activity {
     public void clearScore() {
         score = 0;
         showScore();
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void showScore() {
@@ -113,6 +123,23 @@ public class MainActivity extends Activity {
     }
 
 
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.e("lmf", ">>>>>>>>>onRestoreInstanceState>>>>>>>>>>>");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // TODO Auto-generated method stub
+
+        Log.e("lmf", ">>>>>>>>>onSaveInstanceState>>>>>>>>>>>");
+
+        gameView.saveGame(outState);
+        super.onSaveInstanceState(outState);
+    }
 
     private static MainActivity mainActivity = null;
 

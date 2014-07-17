@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
+import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -116,6 +118,44 @@ public class GameView extends LinearLayout {
 
         addRandomNum();
         addRandomNum();
+    }
+
+    public void loadGame(Bundle bundle) {
+        String data = bundle.getString("data");
+        int score = bundle.getInt("score");
+        Log.e("lmf", ">>>>>>loadGame>>>>>>>>" + data + ":" + score);
+        String lineData[] = data.split("#");
+        for (int y = 0; y < Config.LINES; y++) {
+            String col[] = lineData[y].split("|");
+            for (int x = 0; x < Config.LINES; x++) {
+                cardsMap[x][y].setNum(Integer.valueOf(col[x]));
+            }
+        }
+
+    }
+
+    /**
+     * save like this string 0|2|4|16#0|2|4|32#0|2|4|64#0|2|4|0
+     *
+     * @param bundle
+     */
+    public void saveGame(Bundle bundle) {
+
+        StringBuilder builder = new StringBuilder();
+
+        for (int y = 0; y < Config.LINES; y++) {
+            for (int x = 0; x < Config.LINES; x++) {
+                builder.append(cardsMap[x][y].getNum() + "|");
+            }
+            builder.deleteCharAt(builder.length() - 1);
+            builder.append("#");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        MainActivity aty = MainActivity.getMainActivity();
+        Log.e("lmf", ">>>>>>saveGame>>>>>>>>>>>>" + builder.toString());
+        bundle.putString("data", builder.toString());
+        bundle.putInt("score", aty.getScore());
+
     }
 
     private void addRandomNum() {
