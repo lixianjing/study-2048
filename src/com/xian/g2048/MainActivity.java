@@ -1,4 +1,3 @@
-
 package com.xian.g2048;
 
 import android.app.Activity;
@@ -6,6 +5,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
@@ -20,6 +20,7 @@ public class MainActivity extends Activity {
     }
 
     private int score = 0;
+    private int bestScore = 0;
     private TextView tvScore, tvBestScore;
     private RelativeLayout root = null;
     private GameView gameView;
@@ -53,10 +54,12 @@ public class MainActivity extends Activity {
 
         animLayer = (AnimLayer) findViewById(R.id.animLayer);
 
-        if (savedInstanceState != null) {
-            gameView.loadGame(savedInstanceState);
-        }
 
+        if (savedInstanceState != null) {
+            loadGame(savedInstanceState);
+        } else {
+            loadGame();
+        }
     }
 
     @Override
@@ -73,10 +76,8 @@ public class MainActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 gameView.startGame();
-                Toast.makeText(this, "I am action_refresh", 1000).show();
                 break;
             case R.id.action_share:
-                Toast.makeText(this, "I am action_share", 1000).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -87,10 +88,6 @@ public class MainActivity extends Activity {
         showScore();
     }
 
-    public int getScore() {
-        return score;
-    }
-
     public void showScore() {
         tvScore.setText(score + "");
     }
@@ -99,23 +96,13 @@ public class MainActivity extends Activity {
         score += s;
         showScore();
 
-        int maxScore = Math.max(score, getBestScore());
-        saveBestScore(maxScore);
-        showBestScore(maxScore);
+        bestScore = Math.max(score, bestScore);
+        showBestScore();
     }
 
-    public void saveBestScore(int s) {
-        Editor e = getPreferences(MODE_PRIVATE).edit();
-        e.putInt(SP_KEY_BEST_SCORE, s);
-        e.commit();
-    }
 
-    public int getBestScore() {
-        return getPreferences(MODE_PRIVATE).getInt(SP_KEY_BEST_SCORE, 0);
-    }
-
-    public void showBestScore(int s) {
-        tvBestScore.setText(s + "");
+    public void showBestScore() {
+        tvBestScore.setText(bestScore + "");
     }
 
     public AnimLayer getAnimLayer() {
@@ -123,21 +110,25 @@ public class MainActivity extends Activity {
     }
 
 
+    @Override
+    protected void onStart() {
+        // TODO Auto-generated method stub
+        super.onStart();
+    }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onStop() {
         // TODO Auto-generated method stub
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.e("lmf", ">>>>>>>>>onRestoreInstanceState>>>>>>>>>>>");
+        super.onStop();
+
     }
+
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // TODO Auto-generated method stub
-
-        Log.e("lmf", ">>>>>>>>>onSaveInstanceState>>>>>>>>>>>");
-
-        gameView.saveGame(outState);
+        saveGame(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -147,6 +138,74 @@ public class MainActivity extends Activity {
         return mainActivity;
     }
 
-    public static final String SP_KEY_BEST_SCORE = "bestScore";
+
+    private long mExitTime;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // TODO Auto-generated method stub
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                Toast.makeText(this, "再按一次退出", Toast.LENGTH_SHORT).show();
+                mExitTime = System.currentTimeMillis();
+            } else {
+                saveGame();
+                finish();
+            }
+            return true;
+        }
+        // 拦截MENU按钮点击事件，让他无任何操作
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+
+    private void loadGame() {
+        long time = System.currentTimeMillis();
+        String data = getPreferences(MODE_PRIVATE).getString(Config.SP_KEY_CURRENT_DATA, null);
+        score = getPreferences(MODE_PRIVATE).getInt(Config.SP_KEY_CURRENT_SCORE, 0);
+        bestScore = getPreferences(MODE_PRIVATE).getInt(Config.SP_KEY_BEST_SCORE, 0);
+        gameView.setData(data);
+        Log.e("lmf", ">>>>>>>>onStart>>>>2222>>>>>" + (System.currentTimeMillis() - time));
+        showScore();
+        showBestScore();
+    }
+
+    private void loadGame(Bundle bundle) {
+        long time = System.currentTimeMillis();
+        String data = bundle.getString(Config.SP_KEY_CURRENT_DATA);
+        score = bundle.getInt(Config.SP_KEY_CURRENT_SCORE, 0);
+        bestScore = bundle.getInt(Config.SP_KEY_BEST_SCORE, 0);
+        gameView.setData(data);
+        Log.e("lmf", ">>>>>>>>onStart>>>>2222>>>>>" + (System.currentTimeMillis() - time));
+        showScore();
+        showBestScore();
+    }
+
+
+
+    private void saveGame() {
+        long time = System.currentTimeMillis();
+        String data = gameView.saveGame();
+        Editor e = getPreferences(MODE_PRIVATE).edit();
+        e.putString(Config.SP_KEY_CURRENT_DATA, data);
+        e.putInt(Config.SP_KEY_CURRENT_SCORE, score);
+        e.putInt(Config.SP_KEY_BEST_SCORE, bestScore);
+        e.commit();
+        Log.e("lmf", ">>>>>>>>saveGame>>>>1111>>>>>" + (System.currentTimeMillis() - time));
+    }
+
+
+    private void saveGame(Bundle bundle) {
+        long time = System.currentTimeMillis();
+        String data = gameView.saveGame();
+        bundle.putString(Config.SP_KEY_CURRENT_DATA, data);
+        bundle.putInt(Config.SP_KEY_CURRENT_SCORE, score);
+        bundle.putInt(Config.SP_KEY_BEST_SCORE, bestScore);
+        Log.e("lmf", ">>>>>>>>saveGame>>>>1111>>>>>" + (System.currentTimeMillis() - time));
+    }
 
 }

@@ -1,24 +1,26 @@
 
 package com.xian.g2048;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
-import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GameView extends LinearLayout {
 
     private final Card[][] cardsMap = new Card[Config.LINES][Config.LINES];
     private final List<Point> emptyPoints = new ArrayList<Point>();
+
+    private String data;
 
     public GameView(Context context) {
         this(context, null);
@@ -70,6 +72,9 @@ public class GameView extends LinearLayout {
                 return true;
             }
         });
+
+
+
     }
 
     @Override
@@ -80,7 +85,13 @@ public class GameView extends LinearLayout {
 
         addCards(Config.CARD_WIDTH, Config.CARD_WIDTH);
 
-        startGame();
+        Log.e("lmf", ">>>>onSizeChanged>>>>>>>>>>>>>>" + data);
+        if (TextUtils.isEmpty(data)) {
+            startGame();
+        } else {
+            loadGame(data);
+        }
+
     }
 
     private void addCards(int cardWidth, int cardHeight) {
@@ -105,10 +116,9 @@ public class GameView extends LinearLayout {
     }
 
     public void startGame() {
-
+        Log.e("lmf", ">>>>>>>>>startGame>>>>>>>");
         MainActivity aty = MainActivity.getMainActivity();
         aty.clearScore();
-        aty.showBestScore(aty.getBestScore());
 
         for (int y = 0; y < Config.LINES; y++) {
             for (int x = 0; x < Config.LINES; x++) {
@@ -120,41 +130,50 @@ public class GameView extends LinearLayout {
         addRandomNum();
     }
 
-    public void loadGame(Bundle bundle) {
-        String data = bundle.getString("data");
-        int score = bundle.getInt("score");
-        Log.e("lmf", ">>>>>>loadGame>>>>>>>>" + data + ":" + score);
+
+    public void loadGame(String data) {
+        Log.e("lmf", ">>>>>>loadGame>>>>>>>>" + data + ":");
         String lineData[] = data.split("#");
         for (int y = 0; y < Config.LINES; y++) {
-            String col[] = lineData[y].split("|");
+            String col[] = lineData[y].split("-");
             for (int x = 0; x < Config.LINES; x++) {
-                cardsMap[x][y].setNum(Integer.valueOf(col[x]));
+
+                Card card = cardsMap[x][y];
+                card.setNum(Integer.valueOf(col[x]));
+            }
+        }
+
+        for (int y = 0; y < Config.LINES; y++) {
+            for (int x = 0; x < Config.LINES; x++) {
+                if (cardsMap[x][y].getNum() <= 0) {
+                    emptyPoints.add(new Point(x, y));
+                }
             }
         }
 
     }
 
     /**
-     * save like this string 0|2|4|16#0|2|4|32#0|2|4|64#0|2|4|0
+     * save like this string 0*2*4*16#0*2*4*32#0|2|4|64#0|2|4|0
      *
      * @param bundle
      */
-    public void saveGame(Bundle bundle) {
+    public String saveGame() {
 
         StringBuilder builder = new StringBuilder();
 
         for (int y = 0; y < Config.LINES; y++) {
             for (int x = 0; x < Config.LINES; x++) {
-                builder.append(cardsMap[x][y].getNum() + "|");
+                builder.append(cardsMap[x][y].getNum() + "-");
             }
             builder.deleteCharAt(builder.length() - 1);
             builder.append("#");
         }
         builder.deleteCharAt(builder.length() - 1);
-        MainActivity aty = MainActivity.getMainActivity();
         Log.e("lmf", ">>>>>>saveGame>>>>>>>>>>>>" + builder.toString());
-        bundle.putString("data", builder.toString());
-        bundle.putInt("score", aty.getScore());
+
+
+        return builder.toString();
 
     }
 
@@ -371,6 +390,15 @@ public class GameView extends LinearLayout {
         }
 
     }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
 
 
 }
