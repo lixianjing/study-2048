@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,9 +14,6 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    public MainActivity() {
-        mainActivity = this;
-    }
 
     private int score = 0;
     private int bestScore = 0;
@@ -25,6 +21,7 @@ public class MainActivity extends Activity {
     private RelativeLayout root = null;
     private GameView gameView;
     private AnimLayer animLayer = null;
+    private long mExitTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +43,7 @@ public class MainActivity extends Activity {
         tvBestScore = (TextView) findViewById(R.id.tvBestScore);
 
         gameView = (GameView) findViewById(R.id.gameView);
+        gameView.setActivity(this);
 
         LayoutParams params = gameView.getLayoutParams();
         params.width = min;
@@ -126,20 +124,19 @@ public class MainActivity extends Activity {
 
 
     @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        gameView.setActivity(null);
+        super.onDestroy();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         // TODO Auto-generated method stub
         saveGame(outState);
         super.onSaveInstanceState(outState);
     }
 
-    private static MainActivity mainActivity = null;
-
-    public static MainActivity getMainActivity() {
-        return mainActivity;
-    }
-
-
-    private long mExitTime;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -164,23 +161,19 @@ public class MainActivity extends Activity {
 
 
     private void loadGame() {
-        long time = System.currentTimeMillis();
         String data = getPreferences(MODE_PRIVATE).getString(Config.SP_KEY_CURRENT_DATA, null);
         score = getPreferences(MODE_PRIVATE).getInt(Config.SP_KEY_CURRENT_SCORE, 0);
         bestScore = getPreferences(MODE_PRIVATE).getInt(Config.SP_KEY_BEST_SCORE, 0);
         gameView.setData(data);
-        Log.e("lmf", ">>>>>>>>onStart>>>>2222>>>>>" + (System.currentTimeMillis() - time));
         showScore();
         showBestScore();
     }
 
     private void loadGame(Bundle bundle) {
-        long time = System.currentTimeMillis();
         String data = bundle.getString(Config.SP_KEY_CURRENT_DATA);
         score = bundle.getInt(Config.SP_KEY_CURRENT_SCORE, 0);
         bestScore = bundle.getInt(Config.SP_KEY_BEST_SCORE, 0);
         gameView.setData(data);
-        Log.e("lmf", ">>>>>>>>onStart>>>>2222>>>>>" + (System.currentTimeMillis() - time));
         showScore();
         showBestScore();
     }
@@ -188,24 +181,20 @@ public class MainActivity extends Activity {
 
 
     private void saveGame() {
-        long time = System.currentTimeMillis();
         String data = gameView.saveGame();
         Editor e = getPreferences(MODE_PRIVATE).edit();
         e.putString(Config.SP_KEY_CURRENT_DATA, data);
         e.putInt(Config.SP_KEY_CURRENT_SCORE, score);
         e.putInt(Config.SP_KEY_BEST_SCORE, bestScore);
         e.commit();
-        Log.e("lmf", ">>>>>>>>saveGame>>>>1111>>>>>" + (System.currentTimeMillis() - time));
     }
 
 
     private void saveGame(Bundle bundle) {
-        long time = System.currentTimeMillis();
         String data = gameView.saveGame();
         bundle.putString(Config.SP_KEY_CURRENT_DATA, data);
         bundle.putInt(Config.SP_KEY_CURRENT_SCORE, score);
         bundle.putInt(Config.SP_KEY_BEST_SCORE, bestScore);
-        Log.e("lmf", ">>>>>>>>saveGame>>>>1111>>>>>" + (System.currentTimeMillis() - time));
     }
 
 }

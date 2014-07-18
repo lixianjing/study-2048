@@ -1,4 +1,3 @@
-
 package com.xian.g2048;
 
 import java.util.ArrayList;
@@ -20,7 +19,10 @@ public class GameView extends LinearLayout {
     private final Card[][] cardsMap = new Card[Config.LINES][Config.LINES];
     private final List<Point> emptyPoints = new ArrayList<Point>();
 
+    private MainActivity mActivity;
     private String data;
+
+
 
     public GameView(Context context) {
         this(context, null);
@@ -117,8 +119,7 @@ public class GameView extends LinearLayout {
 
     public void startGame() {
         Log.e("lmf", ">>>>>>>>>startGame>>>>>>>");
-        MainActivity aty = MainActivity.getMainActivity();
-        aty.clearScore();
+        mActivity.clearScore();
 
         for (int y = 0; y < Config.LINES; y++) {
             for (int x = 0; x < Config.LINES; x++) {
@@ -194,7 +195,7 @@ public class GameView extends LinearLayout {
             Point p = emptyPoints.remove((int) (Math.random() * emptyPoints.size()));
             cardsMap[p.x][p.y].setNum(Math.random() > 0.1 ? 2 : 4);
 
-            MainActivity.getMainActivity().getAnimLayer().createScaleTo1(cardsMap[p.x][p.y]);
+            mActivity.getAnimLayer().createScaleTo1(cardsMap[p.x][p.y]);
         }
     }
 
@@ -210,8 +211,8 @@ public class GameView extends LinearLayout {
 
                         if (cardsMap[x][y].getNum() <= 0) {
 
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x1][y], cardsMap[x][y], x1, x, y, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x1][y],
+                                    cardsMap[x][y], x1, x, y, y);
 
                             cardsMap[x][y].setNum(cardsMap[x1][y].getNum());
                             cardsMap[x1][y].setNum(0);
@@ -220,12 +221,12 @@ public class GameView extends LinearLayout {
                             merge = true;
 
                         } else if (cardsMap[x][y].equals(cardsMap[x1][y])) {
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x1][y], cardsMap[x][y], x1, x, y, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x1][y],
+                                    cardsMap[x][y], x1, x, y, y);
                             cardsMap[x][y].setNum(cardsMap[x][y].getNum() * 2);
                             cardsMap[x1][y].setNum(0);
 
-                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            mActivity.addScore(cardsMap[x][y].getNum());
                             merge = true;
                         }
 
@@ -252,19 +253,19 @@ public class GameView extends LinearLayout {
                     if (cardsMap[x1][y].getNum() > 0) {
 
                         if (cardsMap[x][y].getNum() <= 0) {
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x1][y], cardsMap[x][y], x1, x, y, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x1][y],
+                                    cardsMap[x][y], x1, x, y, y);
                             cardsMap[x][y].setNum(cardsMap[x1][y].getNum());
                             cardsMap[x1][y].setNum(0);
 
                             x++;
                             merge = true;
                         } else if (cardsMap[x][y].equals(cardsMap[x1][y])) {
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x1][y], cardsMap[x][y], x1, x, y, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x1][y],
+                                    cardsMap[x][y], x1, x, y, y);
                             cardsMap[x][y].setNum(cardsMap[x][y].getNum() * 2);
                             cardsMap[x1][y].setNum(0);
-                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            mActivity.addScore(cardsMap[x][y].getNum());
                             merge = true;
                         }
 
@@ -291,8 +292,8 @@ public class GameView extends LinearLayout {
                     if (cardsMap[x][y1].getNum() > 0) {
 
                         if (cardsMap[x][y].getNum() <= 0) {
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x][y1], cardsMap[x][y], x, x, y1, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x][y1],
+                                    cardsMap[x][y], x, x, y1, y);
                             cardsMap[x][y].setNum(cardsMap[x][y1].getNum());
                             cardsMap[x][y1].setNum(0);
 
@@ -300,11 +301,11 @@ public class GameView extends LinearLayout {
 
                             merge = true;
                         } else if (cardsMap[x][y].equals(cardsMap[x][y1])) {
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x][y1], cardsMap[x][y], x, x, y1, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x][y1],
+                                    cardsMap[x][y], x, x, y1, y);
                             cardsMap[x][y].setNum(cardsMap[x][y].getNum() * 2);
                             cardsMap[x][y1].setNum(0);
-                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            mActivity.addScore(cardsMap[x][y].getNum());
                             merge = true;
                         }
 
@@ -332,19 +333,19 @@ public class GameView extends LinearLayout {
                     if (cardsMap[x][y1].getNum() > 0) {
 
                         if (cardsMap[x][y].getNum() <= 0) {
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x][y1], cardsMap[x][y], x, x, y1, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x][y1],
+                                    cardsMap[x][y], x, x, y1, y);
                             cardsMap[x][y].setNum(cardsMap[x][y1].getNum());
                             cardsMap[x][y1].setNum(0);
 
                             y++;
                             merge = true;
                         } else if (cardsMap[x][y].equals(cardsMap[x][y1])) {
-                            MainActivity.getMainActivity().getAnimLayer()
-                                    .createMoveAnim(cardsMap[x][y1], cardsMap[x][y], x, x, y1, y);
+                            mActivity.getAnimLayer().createMoveAnim(cardsMap[x][y1],
+                                    cardsMap[x][y], x, x, y1, y);
                             cardsMap[x][y].setNum(cardsMap[x][y].getNum() * 2);
                             cardsMap[x][y1].setNum(0);
-                            MainActivity.getMainActivity().addScore(cardsMap[x][y].getNum());
+                            mActivity.addScore(cardsMap[x][y].getNum());
                             merge = true;
                         }
 
@@ -366,11 +367,11 @@ public class GameView extends LinearLayout {
 
         ALL: for (int y = 0; y < Config.LINES; y++) {
             for (int x = 0; x < Config.LINES; x++) {
-                if (cardsMap[x][y].getNum() == 0 ||
-                        (x > 0 && cardsMap[x][y].equals(cardsMap[x - 1][y])) ||
-                        (x < Config.LINES - 1 && cardsMap[x][y].equals(cardsMap[x + 1][y])) ||
-                        (y > 0 && cardsMap[x][y].equals(cardsMap[x][y - 1])) ||
-                        (y < Config.LINES - 1 && cardsMap[x][y].equals(cardsMap[x][y + 1]))) {
+                if (cardsMap[x][y].getNum() == 0
+                        || (x > 0 && cardsMap[x][y].equals(cardsMap[x - 1][y]))
+                        || (x < Config.LINES - 1 && cardsMap[x][y].equals(cardsMap[x + 1][y]))
+                        || (y > 0 && cardsMap[x][y].equals(cardsMap[x][y - 1]))
+                        || (y < Config.LINES - 1 && cardsMap[x][y].equals(cardsMap[x][y + 1]))) {
 
                     complete = false;
                     break ALL;
@@ -397,6 +398,14 @@ public class GameView extends LinearLayout {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public MainActivity getActivity() {
+        return mActivity;
+    }
+
+    public void setActivity(MainActivity activity) {
+        this.mActivity = activity;
     }
 
 
